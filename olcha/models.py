@@ -12,7 +12,8 @@ class BaseModel(models.Model):
 
 class Category(BaseModel):
     title = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(blank=True)
+    image = models.ImageField(upload_to='category/%Y/%m/%d/', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -24,13 +25,13 @@ class Category(BaseModel):
 
     class Meta:
         verbose_name_plural = 'Categories'
-        db_table = 'categories'
 
 
 class Group(BaseModel):
     title = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
-    category = models.ManyToManyField(Category, related_name='groups')
+    slug = models.SlugField(blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='groups')
+    image = models.ImageField(upload_to='category/%Y/%m/%d/', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -42,7 +43,6 @@ class Group(BaseModel):
 
     class Meta:
         verbose_name_plural = 'Groups'
-        db_table = 'groups'
 
 
 class Product(BaseModel):
@@ -50,15 +50,13 @@ class Product(BaseModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='products')
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
-    price = models.FloatField(blank=True, null=True)
-    discount = models.IntegerField(default=0, blank=True)
+    price = models.FloatField(blank=True)
+    discount = models.PositiveIntegerField(default=0, blank=True)
     quantity = models.PositiveIntegerField(default=0, blank=True)
 
     @property
     def discounted_price(self):
-        if self.price and self.discount > 0:
-            return self.price * (1 - self.discount / 100)
-        return self.price
+        return self.price * (1 - self.discount / 100) if self.discount else self.price
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -69,13 +67,13 @@ class Product(BaseModel):
         return self.name
 
     class Meta:
-        db_table = 'products'
-        verbose_name_plural = 'products'
+        verbose_name_plural = 'Products'
 
 
 class Image(BaseModel):
     image = models.ImageField(upload_to='products/images/', blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='images')
     is_primary = models.BooleanField(default=False)
 
     @property
@@ -83,10 +81,7 @@ class Image(BaseModel):
         return self.image if self.is_primary else None
 
     def __str__(self):
-        return f'Image of {self.product.name}'
-
-    class Meta:
-        db_table = 'images'
+        return f"Image {self.id} for {self.product.name}"
 
 
 class Attribute(BaseModel):
@@ -95,9 +90,6 @@ class Attribute(BaseModel):
     def __str__(self):
         return self.name
 
-    class Meta:
-        db_table = 'attributes'
-
 
 class AttributeValue(BaseModel):
     value = models.CharField(max_length=255, blank=True)
@@ -105,15 +97,11 @@ class AttributeValue(BaseModel):
     def __str__(self):
         return self.value
 
-    class Meta:
-        db_table = 'attribute_values'
-
 
 class ProductAttribute(BaseModel):
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     value = models.ForeignKey(AttributeValue, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ('attribute', 'value', 'product')
-        db_table = 'product_attributes'
+    def __str__(self):
+        return f"{self.attribute.name}: {self.value.value} for {self.product.name}"

@@ -1,13 +1,14 @@
 from django.contrib import admin
 from olcha.models import Category, Group, Product, ProductAttribute, Attribute, AttributeValue, Image
-# Register your models here.
 
+# Register your models here.
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'slug', 'created_at')
     search_fields = ('id', 'title', 'slug')
     list_filter = ('created_at',)
+    prepopulated_fields = {"slug": ("title",)}
 
 
 @admin.register(Group)
@@ -15,32 +16,12 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'slug', 'created_at')
     search_fields = ('id', 'title', 'slug')
     list_filter = ('created_at',)
+    prepopulated_fields = {"slug": ("title",)}
 
 
-
-
-# Register your models here.
-
-# @admin.register(Product)
-# class ProductAdmin(admin.ModelAdmin):
-#     pass
-#
-#
-# @admin.register(ProductAttribute)
-# class ProductAttributeAdmin(admin.ModelAdmin):
-#     pass
-#
-#
-# @admin.register(AttributeValue)
-# class AttributeValueAdmin(admin.ModelAdmin):
-#     pass
-#
-#
-# @admin.register(Attribute)
-# class AttributeAdmin(admin.ModelAdmin):
-#     pass
-#
-#
-# @admin.register(Image)
-# class ImageAdmin(admin.ModelAdmin):
-#     pass
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'slug', 'created_at')
+    search_fields = ('id', 'name', 'slug')
+    list_filter = ('created_at',)
+    prepopulated_fields = {"slug": ("name",)}
