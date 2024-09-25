@@ -1,5 +1,5 @@
 from django.contrib import admin
-from olcha.models import Category, Group, Product, ProductAttribute, Attribute, AttributeValue, Image
+from olcha.models import Category, Group, Product, ProductAttribute, Attribute, AttributeValue, Image, Order, Comment
 
 # Register your models here.
 
@@ -25,3 +25,10 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('id', 'name', 'slug')
     list_filter = ('created_at',)
     prepopulated_fields = {"slug": ("name",)}
+
+admin.site.register(Order)
+admin.site.register(Comment)
+admin.site.register(Attribute)
+admin.site.register(AttributeValue)
+admin.site.register(ProductAttribute)
+admin.site.register(Image)
