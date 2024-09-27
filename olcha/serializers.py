@@ -1,6 +1,6 @@
 from django.db.models import Avg
 from rest_framework import serializers
-from olcha.models import Category, Group, Product, Image, Comment
+from olcha.models import Category, Group, Product, Image, Comment, AttributeKey, AttributeValue, ProductAttribute
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -50,16 +50,41 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AttributeKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeKey
+        fields = ['key_name']
+
+
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = ['value_name']
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    attr_key = AttributeKeySerializer()
+    attr_value = AttributeValueSerializer()
+
+    class Meta:
+        model = ProductAttribute
+        fields = ['attr_key', 'attr_value']
+
 class ProductSerializer(serializers.ModelSerializer):
     comments_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
-
+    category_name = serializers.CharField(source='group.category.title')
+    attributes = ProductAttributeSerializer(many=True, read_only=True)
 
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'group', 'slug', 'description', 'price', 'discount',
+            'quantity', 'comments_count', 'is_liked', 'average_rating',
+            'category_name', 'attributes'
+        ]
 
     def get_comments_count(self, obj):
         return obj.comments.count()
@@ -78,3 +103,7 @@ class ProductSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['updated_at'] = instance.updated_at
         return representation
+
+
+
+

@@ -94,6 +94,7 @@ class Order(BaseModel):
     month = models.PositiveSmallIntegerField(default=3, null=True, blank=True,
                                              validators=[MinValueValidator(3), MaxValueValidator(12)])
 
+
     @property
     def monthly_payment(self):
         return self.product.price // self.month
@@ -122,24 +123,23 @@ class Comment(BaseModel):
         return self.message
 
 
-class Attribute(BaseModel):
-    name = models.CharField(max_length=255, blank=True)
+class AttributeKey(models.Model):
+    key_name = models.CharField(max_length=255, null=True, blank=True)
+
 
     def __str__(self):
-        return self.name
+        return self.key_name
 
 
 class AttributeValue(BaseModel):
-    value = models.CharField(max_length=255, blank=True)
+    value_name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.value
+        return self.value_name
 
 
-class ProductAttribute(BaseModel):
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
-    value = models.ForeignKey(AttributeValue, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+class ProductAttribute(models.Model):
+    attr_key = models.ForeignKey(AttributeKey, on_delete=models.CASCADE, null=True, blank=True)
+    attr_value = models.ForeignKey(AttributeValue, on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True,related_name='attributes')
 
-    def __str__(self):
-        return f"{self.attribute.name}: {self.value.value} for {self.product.name}"

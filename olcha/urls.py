@@ -1,5 +1,10 @@
 from django.urls import path
 from olcha.views import category, group, product
+from olcha.views.product import (
+    AttributeKeyListApiView,
+    AttributeValueListApiView,
+    ProductAttributeListApiView
+)
 
 urlpatterns = [
     path('categories/', category.CategoryListApiView.as_view(), name='categories'),
@@ -9,4 +14,8 @@ urlpatterns = [
     path('all-images/', product.ImageListApiView.as_view(), name='all-products'),
     path('all-comments/', product.CommentListApiView.as_view(), name='all-comments'),
 
+    # Attributes
+    path('attribute-keys/', AttributeKeyListApiView.as_view(), name='attribute-keys'),
+    path('attribute-values/', AttributeValueListApiView.as_view(), name='attribute-values'),
+    path('product-attributes/', ProductAttributeListApiView.as_view(), name='product-attributes'),
 ]
