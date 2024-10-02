@@ -8,8 +8,9 @@ from olcha.views.product import (
 
 urlpatterns = [
     path('categories/', category.CategoryListApiView.as_view(), name='categories'),
-    path('groups/', group.GroupListApiView.as_view(), name='groups'),
+    path('groups/', group.GroupList.as_view(), name='groups'),
     path('category/<slug:slug>/', category.CategoryDetailApiView.as_view(), name='category'),
+    path('groups/detail/<int:pk>/', group.GroupDetailApiView.as_view()),
     path('all-products/', product.ProductListApiView.as_view(), name='all-products'),
     path('all-images/', product.ImageListApiView.as_view(), name='all-products'),
     path('all-comments/', product.CommentListApiView.as_view(), name='all-comments'),

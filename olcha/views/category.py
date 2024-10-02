@@ -3,14 +3,19 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from olcha.models import Category, Group
 from olcha.serializers import CategorySerializer, GroupSerializer
 
 
 class CategoryDetailApiView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, category_slug):
         category = Category.objects.get(slug=category_slug)
         serializer = CategorySerializer(category, context={'request': request})
@@ -18,6 +23,8 @@ class CategoryDetailApiView(APIView):
 
 
 class CategoryListApiView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         categories = Category.objects.all()

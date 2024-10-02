@@ -1,17 +1,19 @@
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from olcha.models import Product, Image, Comment, AttributeKey, AttributeValue, ProductAttribute
-from olcha.serializers import ProductSerializer, ImageSerializer, CommentSerializer, AttributeKeySerializer, AttributeValueSerializer, ProductAttributeSerializer
+from olcha.serializers import ProductSerializer, ImageSerializer, CommentSerializer, AttributeKeySerializer, \
+    AttributeValueSerializer, ProductAttributeSerializer
 
 
 class ProductListApiView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated,]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [JWTAuthentication, ]
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
 
 
 class ImageListApiView(ListAPIView):
@@ -25,15 +27,21 @@ class CommentListApiView(ListCreateAPIView):
 
 
 class AttributeKeyListApiView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     queryset = AttributeKey.objects.all()
     serializer_class = AttributeKeySerializer
 
 
 class AttributeValueListApiView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     queryset = AttributeValue.objects.all()
     serializer_class = AttributeValueSerializer
 
 
 class ProductAttributeListApiView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     queryset = ProductAttribute.objects.all()
     serializer_class = ProductAttributeSerializer

@@ -2,24 +2,25 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from user.serializer import UserRegisterSerializer
+
 
 # Create your views here.
 
+
 class UserLoginApiView(APIView):
+    authentication_classes = (TokenAuthentication,)
+
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-
-        if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = authenticate(username=username, password=password)
-
+        user = authenticate(username=request.data['email'], password=request.data['password'])
+        print(user.username)
         if user:
             token, created = Token.objects.get_or_create(user=user)
             response = {
@@ -27,10 +28,11 @@ class UserLoginApiView(APIView):
                 'token': token.key,
                 'user': user.username,
                 'created': created
+
             }
             return Response(response, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Invalid credentials'}, status=401)
 
 
 class UserLogoutApiView(APIView):
@@ -40,3 +42,18 @@ class UserLogoutApiView(APIView):
         token = Token.objects.get(user=request.user)
         token.delete()
         return Response({"success": True, "detail": "Logged out!"}, status=status.HTTP_200_OK)
+
+
+class UserRegisterAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                'success': True,
+                'user': serializer.data,
+                'token': Token.objects.get(user=User.objects.get(username=serializer.data['username'])).key
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        raise ValidationError(
+            serializer.errors, code=status.HTTP_406_NOT_ACCEPTABLE)
