@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -13,8 +13,8 @@ from olcha.serializers import CategorySerializer, GroupSerializer
 
 
 class GroupList(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+    # authentication_classes = [JWTAuthentication]
 
     def get(self, request):
         groups = Group.objects.all()
@@ -35,8 +35,8 @@ class GroupList(APIView):
 
 
 class GroupDetailApiView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+    # authentication_classes = [JWTAuthentication]
 
     def get_object(self, pk):
         try:
