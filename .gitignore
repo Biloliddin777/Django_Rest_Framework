@@ -137,7 +137,7 @@ GitHub.sublime-settings
 !.vscode/extensions.json
 .history
 
-# migration
-db.sqlite3/
-
-db.sqlite3
+## migration
+#db.sqlite3/
+#
+#db.sqlite3
